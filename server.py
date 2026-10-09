@@ -5,7 +5,7 @@ import glob
 import os
 from validate import validate_fighter
 
-PORT = 8000
+PORT = int(os.environ.get("PORT", 3000))
 
 class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -39,9 +39,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
 if __name__ == "__main__":
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        print(f"Serving at http://localhost:{PORT}")
-        print("Open http://localhost:8000/JSON%20Auto-Battler%20Arena.html in your browser.")
+    socketserver.TCPServer.allow_reuse_address = True
+    with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
+        print(f"Serving at http://0.0.0.0:{PORT}", flush=True)
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

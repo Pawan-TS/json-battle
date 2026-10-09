@@ -4,261 +4,1762 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>JSON Auto-Battler Arena</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@600;800&display=swap">
+<meta name="description" content="Simulated tournament auto-battler arena for custom JSON fighters.">
+<meta property="og:title" content="JSON Auto-Battler Arena">
+<meta property="og:description" content="Simulated tournament auto-battler arena for custom JSON fighters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
---bg:#e9eef5;--panel:#fff;--text:#1d2433;--mute:#667089;--line:#ccd4e2;--accent:#3b6fe0;--logbg:#fff}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141d;--panel:#1a2030;--text:#e8ecf5;--mute:#8d97b0;--line:#2c344a;--accent:#7aa2ff;--logbg:#131826}}
-:root[data-theme="dark"]{--bg:#10141d;--panel:#1a2030;--text:#e8ecf5;--mute:#8d97b0;--line:#2c344a;--accent:#7aa2ff;--logbg:#131826}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*,*:before,*:after{box-sizing:inherit}
-body{margin:0;background:var(--bg);color:var(--text);font:600 15px/1.45 Nunito,system-ui,sans-serif}
-button,textarea{font:inherit;color:inherit}
-.wrap{max-width:1100px;margin:0 auto;padding:14px}
-h1{font:400 15px/1.4 "Press Start 2P",monospace;margin:4px 0 12px}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px}
-@media(max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
-.panel{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:10px}
-.scene{position:relative;height:340px;border-radius:10px;border:2px solid #20304a;overflow:hidden;
-background:linear-gradient(#7ec8f2 0%,#bfe6fb 46%,#8fd06a 46%,#5aa84a 100%)}
-.pad{position:absolute;width:190px;height:44px;border-radius:50%;background:radial-gradient(#6b9a3a,#4d7f2c);box-shadow:0 4px 0 #3e6a22}
-.pad.o{right:5%;top:34%}.pad.p{left:6%;bottom:6%;width:230px;height:52px}
-.sp{position:absolute;display:flex;flex-direction:column;align-items:center;transition:transform .5s,opacity .5s}
-.sp.o{right:9%;top:12%}.sp.p{left:10%;bottom:12%}
-.av{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;border:4px solid rgba(0,0,0,.35);font-size:48px;box-shadow:inset 0 -10px 0 rgba(0,0,0,.18)}
-.sp.p .av{width:140px;height:140px;font-size:66px}
-.sp .nm{margin-top:4px;font-size:12px;background:rgba(0,0,0,.45);color:#fff;border-radius:6px;padding:1px 8px}
-.fainted{transform:translateY(60px) rotate(18deg);opacity:0}
-.hit{animation:shake .45s}
-.lunge-o{animation:lo .35s}.lunge-p{animation:lp .35s}
-@keyframes shake{0%,100%{transform:none;filter:none}20%{transform:translateX(-12px);filter:brightness(2.2)}40%{transform:translateX(10px)}60%{transform:translateX(-7px);filter:brightness(2.2)}80%{transform:translateX(4px)}}
-@keyframes lo{50%{transform:translate(-40px,30px)}}@keyframes lp{50%{transform:translate(50px,-34px)}}
-.dmg{position:absolute;top:-6px;font:400 14px "Press Start 2P",monospace;color:#fff;text-shadow:2px 2px 0 #c0262d,-1px -1px 0 #c0262d;animation:up 1s forwards}
-@keyframes up{to{transform:translateY(-34px);opacity:0}}
-.info{position:absolute;width:250px;background:rgba(255,255,255,.92);color:#1d2433;border:2px solid #20304a;border-radius:8px 8px 8px 0;padding:6px 10px}
-.info.o{left:3%;top:6%}.info.p{right:3%;bottom:8%}
-.info b{display:flex;justify-content:space-between;font-size:14px}
-.info small{font-weight:800;color:#556}
-.bar{height:10px;border-radius:5px;background:#2b3345;margin:4px 0 2px;overflow:hidden;border:1px solid #20304a}
-.bar i{display:block;height:100%;transition:width .5s,background .5s}
-.banner{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:10px;background:rgba(10,14,28,.78);color:#fff;padding:20px}
-.banner h2{font:400 18px/1.5 "Press Start 2P",monospace;margin:0;color:#ffd75e}
-.banner p{margin:0}
-.bov{position:absolute;inset:0;background:#0e1424;color:#fff;display:flex;flex-direction:column;padding:10px 14px}
-.bov h2{font:400 12px/1.5 "Press Start 2P",monospace;color:#ffd75e;margin:0 0 6px}
-.bov svg{flex:1;min-height:0;width:100%}
-.ctl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-.btn{border:2px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:800}
-.btn:hover{border-color:var(--accent)}.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.on{border-color:var(--accent);color:var(--accent)}
-.btn:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.log{height:170px;overflow-y:auto;background:var(--logbg);border:2px solid var(--line);border-radius:10px;padding:8px 12px}
-.log p{margin:2px 0}.log .turn{color:var(--mute);font-weight:800;margin-top:8px}
-.log .hit-l{color:#c0392b}.log .win{color:#1e8f4e;font-weight:800}
-.log p:last-child{background:rgba(120,150,255,.16);border-radius:4px}
-h3{font-size:14px;margin:0 0 6px}
-.side>*+*{margin-top:12px}
-.row{display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid var(--line);font-size:13px}
-.row.out{opacity:.45;text-decoration:line-through}
-.st{color:var(--mute);font-size:12px}
-.m{padding:3px 6px;border-radius:6px;font-size:13px}.m.cur{background:var(--accent);color:#fff}
-.m b{font-weight:800}
-textarea{width:100%;height:150px;border:2px solid var(--line);border-radius:8px;background:var(--logbg);padding:8px;font:12px/1.4 ui-monospace,Menlo,monospace}
-.err{color:#c0392b;font-size:13px;margin:4px 0}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  
+  /* DEFAULT DARK MODE */
+  --bg-deep: #0a0d14;
+  --bg-card: #111622;
+  --bg-surface: #182030;
+  --bg-surface-hover: #202b40;
+  --border-subtle: #20283a;
+  --border-strong: #2f3c56;
+  --accent-cyan: #00b4d8;
+  --accent-amber: #e5a93c;
+  --accent-red: #ef4444;
+  --accent-green: #10b981;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  
+  --stage-bg: #0d111a;
+  --stage-border: #2f3c56;
+  --stage-grid: rgba(255, 255, 255, 0.04);
+  --stage-ring-line: rgba(255, 255, 255, 0.08);
+  --stage-ring-text: rgba(255, 255, 255, 0.2);
+  --pad-o-bg: #181d28;
+  --pad-o-border: rgba(229, 169, 60, 0.5);
+  --pad-p-bg: #141c28;
+  --pad-p-border: rgba(0, 180, 216, 0.5);
+  
+  --hud-bg: #111622;
+  --hud-border: #2f3c56;
+  --hud-text: #ffffff;
+  
+  --log-bg: #0c0f16;
+  --log-text: #94a3b8;
+  --log-border: #20283a;
+  --log-turn-border: #1a2234;
+  
+  --btn-bg: #111622;
+  --btn-border: #2f3c56;
+  --btn-hover: #202b40;
+  --btn-text: #f1f5f9;
+  
+  --form-bg: #182030;
+  --form-border: #2f3c56;
+  --form-text: #ffffff;
+  --json-bg: #0a0d14;
+  
+  --bracket-bg: rgba(10, 13, 20, 0.95);
+  --sprite-shadow: rgba(0, 0, 0, 0.45);
+  
+  --font-display: 'Chakra Petch', sans-serif;
+  --font-ui: 'Space Grotesk', system-ui, sans-serif;
+}
+
+:root[data-theme="light"] {
+  /* OPTIONAL LIGHT MODE */
+  --bg-deep: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-surface: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --accent-cyan: #0284c7;
+  --accent-amber: #d97706;
+  --accent-red: #dc2626;
+  --accent-green: #059669;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #64748b;
+  
+  --stage-bg: #e2e8f0;
+  --stage-border: #cbd5e1;
+  --stage-grid: rgba(15, 23, 42, 0.06);
+  --stage-ring-line: rgba(15, 23, 42, 0.12);
+  --stage-ring-text: rgba(15, 23, 42, 0.35);
+  --pad-o-bg: #fef3c7;
+  --pad-o-border: #d97706;
+  --pad-p-bg: #e0f2fe;
+  --pad-p-border: #0284c7;
+  
+  --hud-bg: #ffffff;
+  --hud-border: #cbd5e1;
+  --hud-text: #0f172a;
+  
+  --log-bg: #ffffff;
+  --log-text: #334155;
+  --log-border: #e2e8f0;
+  --log-turn-border: #e2e8f0;
+  
+  --btn-bg: #ffffff;
+  --btn-border: #cbd5e1;
+  --btn-hover: #f1f5f9;
+  --btn-text: #0f172a;
+  
+  --form-bg: #ffffff;
+  --form-border: #cbd5e1;
+  --form-text: #0f172a;
+  --json-bg: #f8fafc;
+  
+  --bracket-bg: rgba(248, 250, 252, 0.96);
+  --sprite-shadow: rgba(0, 0, 0, 0.12);
+}
+
+*, *:before, *:after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); background: var(--bg-deep); }
+body {
+  margin: 0;
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font: 500 14px/1.45 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+button, textarea, input, select { font: inherit; color: inherit; }
+
+.wrap {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* TOP HEADER */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  margin-bottom: 14px;
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-emblem {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-surface);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font: 700 13px var(--font-display);
+  color: var(--accent-cyan);
+  letter-spacing: 0.05em;
+}
+.brand-title {
+  font: 700 17px/1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  margin: 0;
+}
+.brand-subtitle {
+  font: 500 11px/1.2 var(--font-ui);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.control-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 12px var(--font-display);
+  transition: all 0.15s;
+}
+.control-btn:hover { border-color: var(--text-main); color: var(--text-main); }
+.control-btn.active {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: rgba(0, 180, 216, 0.1);
+}
+
+/* MAIN LAYOUT */
+.layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  gap: 16px;
+}
+@media(max-width: 860px) {
+  .layout-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ARENA CONTAINER */
+.arena-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.stage {
+  position: relative;
+  height: 360px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--stage-bg);
+  border: 1px solid var(--stage-border);
+}
+
+/* ARENA FLOOR GRID */
+.arena-grid-floor {
+  position: absolute;
+  bottom: 0;
+  left: -20%;
+  right: -20%;
+  height: 60%;
+  background: 
+    linear-gradient(var(--stage-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--stage-grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  transform: perspective(300px) rotateX(55deg);
+  transform-origin: bottom center;
+  mask-image: linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%);
+  pointer-events: none;
+}
+.ring-center-line {
+  position: absolute;
+  bottom: 14%;
+  left: 50%;
+  transform: translateX(-50%) perspective(300px) rotateX(55deg);
+  width: 200px;
+  height: 80px;
+  border: 1px solid var(--stage-ring-line);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font: 700 11px var(--font-display);
+  letter-spacing: 0.25em;
+  color: var(--stage-ring-text);
+  pointer-events: none;
+}
+
+/* COMBAT PLATFORMS */
+.pad {
+  position: absolute;
+  border-radius: 50%;
+  transform: perspective(260px) rotateX(55deg);
+  z-index: 1;
+}
+.pad.o {
+  right: 8%;
+  top: 36%;
+  width: 170px;
+  height: 56px;
+  background: var(--pad-o-bg);
+  border: 1px solid var(--pad-o-border);
+}
+.pad.p {
+  left: 8%;
+  bottom: 8%;
+  width: 200px;
+  height: 64px;
+  background: var(--pad-p-bg);
+  border: 1px solid var(--pad-p-border);
+}
+
+/* FIGHTER SPRITES */
+.sp {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.35s ease, opacity 0.4s;
+  z-index: 3;
+}
+.sp.o { right: 11%; top: 12%; }
+.sp.p { left: 11%; bottom: 12%; }
+
+.sprite-actor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: idleBob 2.4s ease-in-out infinite;
+}
+.sp.p .sprite-actor { animation-delay: -1.2s; }
+
+@keyframes idleBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.av-chassis {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  display: grid;
+  place-items: center;
+}
+.sp.p .av-chassis {
+  width: 118px;
+  height: 118px;
+}
+.av-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sprite-shadow {
+  position: absolute;
+  bottom: -4px;
+  width: 65%;
+  height: 12px;
+  background: var(--sprite-shadow);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+.sp .nm-tag {
+  margin-top: 5px;
+  font: 700 12px/1.2 var(--font-display);
+  letter-spacing: 0.04em;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 3px 8px;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* ANIMATIONS */
+.fainted {
+  transform: translateY(45px) rotate(18deg) scale(0.92);
+  opacity: 0 !important;
+}
+.hit {
+  animation: crispImpact 0.4s ease-out;
+}
+.lunge-o { animation: lungeOpponent 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.lunge-p { animation: lungePlayer 0.35s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@keyframes crispImpact {
+  0%, 100% { transform: none; filter: none; }
+  20% { transform: translateX(-12px); filter: brightness(1.7); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(3px); }
+}
+@keyframes lungeOpponent {
+  50% { transform: translate(-42px, 28px); }
+}
+@keyframes lungePlayer {
+  50% { transform: translate(46px, -32px); }
+}
+
+/* DAMAGE NUMBER & MOVE BANNER */
+.dmg-pop {
+  position: absolute;
+  top: -10px;
+  font: 700 16px var(--font-display);
+  color: var(--accent-red);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  animation: dmgFloat 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  z-index: 10;
+  pointer-events: none;
+}
+@keyframes dmgFloat {
+  0% { transform: translateY(0) scale(0.8); opacity: 0; }
+  20% { transform: translateY(-14px) scale(1.15); opacity: 1; }
+  75% { transform: translateY(-28px) scale(1); opacity: 1; }
+  100% { transform: translateY(-40px) scale(0.9); opacity: 0; }
+}
+
+.action-banner {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 8;
+  animation: bannerSlide 0.25s ease-out;
+}
+@keyframes bannerSlide {
+  from { transform: translate(-50%, -10px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+.action-banner.crit {
+  border-color: var(--accent-amber);
+}
+.action-banner .move-tag {
+  font: 700 11px var(--font-display);
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.action-banner .move-title {
+  font: 700 13px var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+}
+.action-banner .crit-label {
+  font: 700 11px var(--font-display);
+  background: var(--accent-amber);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+/* FIGHTING HUD CARDS */
+.hud-card {
+  position: absolute;
+  width: 240px;
+  max-width: 48%;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  z-index: 5;
+}
+.hud-card.o {
+  left: 12px;
+  top: 12px;
+  border-left: 3px solid var(--accent-amber);
+}
+.hud-card.p {
+  right: 12px;
+  bottom: 12px;
+  border-right: 3px solid var(--accent-cyan);
+}
+
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  margin-bottom: 4px;
+}
+.hud-name {
+  font: 700 14px/1.2 var(--font-display);
+  letter-spacing: 0.03em;
+  color: var(--hud-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.hud-archetype {
+  font: 600 11px var(--font-ui);
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.hp-gauge {
+  position: relative;
+  height: 10px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 5px 0 4px;
+}
+.hp-gauge-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--accent-amber);
+  transition: width 0.65s ease-out;
+  opacity: 0.6;
+}
+.hp-gauge-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s ease;
+}
+.hp-gauge-fill.green { background: var(--accent-green); }
+.hp-gauge-fill.yellow { background: var(--accent-amber); }
+.hp-gauge-fill.red { background: var(--accent-red); }
+
+.hud-stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 600 11px var(--font-display);
+  color: var(--text-muted);
+}
+.hud-hp-nums { color: var(--hud-text); font-weight: 700; }
+
+/* OVERLAY MODAL */
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bracket-bg);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: auto;
+}
+.stage-overlay-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.stage-overlay-title {
+  font: 700 14px/1.2 var(--font-display);
+  letter-spacing: 0.06em;
+  color: var(--accent-amber);
+  margin: 0;
+  text-transform: uppercase;
+}
+.stage-overlay svg {
+  flex: 1;
+  min-height: 180px;
+  width: 100%;
+}
+
+.banner-welcome {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  background: var(--stage-bg);
+  padding: 24px;
+  z-index: 12;
+}
+.banner-welcome h2 {
+  font: 700 17px var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-amber);
+  margin: 0;
+}
+.banner-welcome p {
+  color: var(--text-muted);
+  max-width: 420px;
+  margin: 0;
+  font-size: 13px;
+}
+
+/* CONTROL DECK */
+.console-deck {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+.arcade-btn {
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  color: var(--btn-text);
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font: 700 13px var(--font-display);
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.arcade-btn:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--btn-hover);
+}
+.arcade-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.arcade-btn.primary {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+.arcade-btn.primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.speed-selector {
+  display: flex;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.speed-tab {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 9px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font: 700 12px var(--font-display);
+  transition: all 0.15s;
+}
+.speed-tab.active {
+  background: var(--btn-bg);
+  color: var(--accent-cyan);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* COMBAT LOG */
+.log-box {
+  height: 160px;
+  overflow-y: auto;
+  background: var(--log-bg);
+  border: 1px solid var(--log-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.log-line {
+  margin: 3px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--log-text);
+}
+.log-line.turn-marker {
+  color: var(--text-dim);
+  font-weight: 700;
+  margin-top: 8px;
+  border-top: 1px solid var(--log-turn-border);
+  padding-top: 4px;
+}
+.log-line.hit-event { color: var(--accent-red); }
+.log-line.crit-event { color: var(--accent-amber); font-weight: 700; }
+.log-line.victory-event { color: var(--accent-green); font-weight: 700; font-size: 14px; }
+.log-line:last-child {
+  background: rgba(0, 180, 216, 0.08);
+  border-left: 2px solid var(--accent-cyan);
+  padding-left: 6px;
+}
+
+/* SIDE PANEL */
+.side-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 14px;
+}
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 700 13px var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-main);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.bracket-mini-round {
+  margin-bottom: 10px;
+}
+.round-label {
+  font: 700 11px var(--font-display);
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.match-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.match-card.current {
+  border-color: var(--accent-cyan);
+  background: rgba(0, 180, 216, 0.08);
+}
+.match-card .winner-mark {
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.roster-scroll {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.roster-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px;
+}
+.roster-row.eliminated {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+.fighter-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.fighter-badge span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.stats-triad {
+  display: flex;
+  gap: 8px;
+  font: 700 11px var(--font-display);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* FIGHTER CREATOR */
+.creator-deck {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.slider-header {
+  display: flex;
+  justify-content: space-between;
+  font: 600 12px var(--font-display);
+  color: var(--text-muted);
+}
+.slider-header b { color: var(--text-main); }
+input[type="range"] {
+  accent-color: var(--accent-cyan);
+  height: 5px;
+  background: var(--border-strong);
+  border-radius: 2px;
+  outline: none;
+}
+.form-input {
+  width: 100%;
+  background: var(--form-bg);
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: var(--form-text);
+  font: 500 13px var(--font-ui);
+}
+.form-input:focus {
+  border-color: var(--accent-cyan);
+  outline: none;
+}
+.json-area {
+  width: 100%;
+  height: 110px;
+  background: var(--json-bg);
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  padding: 8px;
+  font: 11px/1.35 ui-monospace, Menlo, monospace;
+  color: var(--text-main);
+  resize: vertical;
+}
+.stat-budget-meter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font: 700 12px var(--font-display);
+  color: var(--text-main);
+}
+.stat-budget-meter.over {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+.error-msg {
+  color: var(--accent-red);
+  font: 600 12px var(--font-ui);
+  margin-top: 2px;
+}
+
+/* RESPONSIVE */
+@media(max-width: 640px) {
+  .wrap { padding: 10px; }
+  .top-bar { padding: 8px 12px; margin-bottom: 10px; }
+  .brand-title { font-size: 15px; }
+  .stage { height: 300px; }
+  
+  .pad.o { right: 5%; top: 32%; width: 120px; height: 36px; }
+  .pad.p { left: 5%; bottom: 6%; width: 135px; height: 42px; }
+  
+  .sp.o { right: 7%; top: 10%; }
+  .sp.p { left: 7%; bottom: 8%; }
+  .av-chassis { width: 66px; height: 66px; }
+  .sp.p .av-chassis { width: 82px; height: 82px; }
+  
+  .hud-card { width: auto; max-width: 48%; padding: 5px 8px; }
+  .hud-card.o { left: 8px; top: 8px; }
+  .hud-card.p { right: 8px; bottom: 8px; }
+  .hud-name { font-size: 12px; }
+  .hud-archetype { font-size: 9.5px; }
+  .hp-gauge { height: 7px; margin: 3px 0; }
+  .hud-stats-row { font-size: 9.5px; }
+  
+  .console-deck { padding: 8px; gap: 6px; }
+  .arcade-btn { padding: 6px 10px; font-size: 12px; }
+  .speed-tab { padding: 5px 8px; font-size: 11px; }
+  .log-box { height: 140px; font-size: 12px; }
+}
+
+@media(max-width: 380px) {
+  .stage { height: 280px; }
+  .av-chassis { width: 56px; height: 56px; }
+  .sp.p .av-chassis { width: 68px; height: 68px; }
+  .hud-card { max-width: 47%; padding: 4px 6px; }
+  .hud-name { font-size: 11px; }
+  .hud-archetype { display: none; }
+  .hud-stats-row { font-size: 8.5px; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 </style>
 </head>
 <body>
 <div id="root"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script>
-const {useState,useEffect,useMemo,useRef,createElement:h}=React;
-const CFG={cap:150,hp:[10,100],attack:[1,50],defense:[0,50],rounds:50,v:.15,eff:.5};
-const SEED=[
-{name:"Glass Cannon",hp:40,attack:50,defense:5,catchphrase:"All offense, no regrets!",victory_quote:"Too fast to hit.",archetype:"Glass Cannon"},
-{name:"Unmovable Object",hp:100,defense:40,attack:8,catchphrase:"You shall not merge.",victory_quote:"I outlasted you.",archetype:"Unmovable Object"},
-{name:"Balanced Brawler",hp:60,attack:45,defense:45,catchphrase:"Even stats, even temper.",victory_quote:"Consistency wins.",archetype:"Balanced Brawler"},
-{name:"NullPointer",hp:70,attack:30,defense:40,catchphrase:"Segfault incoming.",victory_quote:"Undefined behavior.",archetype:"Tank"},
-{name:"MergeConflict",hp:45,attack:40,defense:35,catchphrase:"<<<<<<< HEAD",victory_quote:"Resolved. By me.",archetype:"Brawler"},
-{name:"janedoe",hp:55,attack:48,defense:40,catchphrase:"My first PR!",victory_quote:"Git good.",archetype:"Rookie"}];
-const MOVES=["Git Push --force","Merge Strike","Rebase Slam","Cherry-Pick","Stash Smash","Commit Crime","Blame Beam"];
-const ICON=a=>/glass/i.test(a)?"💥":/unmov|tank/i.test(a)?"🛡️":/balanc|brawl/i.test(a)?"🥊":"⚔️";
-const hue=s=>[...s].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
-function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-function check(o){
- if(!o||typeof o!=="object")return"Fighter must be a JSON object.";
- if(typeof o.name!=="string"||!o.name.trim()||o.name.length>24)return"name must be text, 1 to 24 characters.";
- for(const k of["hp","attack","defense"]){const[lo,hi]=CFG[k];
-  if(!Number.isInteger(o[k]))return k+" must be a whole number.";
-  if(o[k]<lo||o[k]>hi)return k+" must be between "+lo+" and "+hi+"."}
- const t=o.hp+o.attack+o.defense;
- if(t>CFG.cap)return"Stats total "+t+", which is "+(t-CFG.cap)+" over the cap of "+CFG.cap+".";
- if(typeof o.catchphrase!=="string"||!o.catchphrase||o.catchphrase.length>80)return"catchphrase must be text, up to 80 characters.";
- return null}
-function fight(a,b,r){
- const F={a,b},hp={a:a.hp,b:b.hp},ev=[];
- const P=(k,t,x)=>ev.push({k,t,hpA:hp.a,hpB:hp.b,...x});
- P("enter",a.name+': "'+a.catchphrase+'"');P("enter",b.name+': "'+b.catchphrase+'"');
- let end=null;
- for(let n=1;n<=CFG.rounds&&!end;n++){
-  P("turn","Turn "+n);
-  const first=a.attack>b.attack||(a.attack===b.attack&&r()<.5)?["a","b"]:["b","a"];
-  for(const s of first){
-   if(hp.a<=0||hp.b<=0)break;
-   const d=s==="a"?"b":"a",at=F[s],df=F[d];
-   const base=Math.max(1,Math.round(at.attack-df.defense*CFG.eff));
-   const dmg=Math.max(1,Math.round(base*(1-CFG.v+2*CFG.v*r())));
-   hp[d]=Math.max(0,hp[d]-dmg);
-   P("hit",at.name+" used "+MOVES[Math.floor(r()*MOVES.length)]+"! "+df.name+" lost "+dmg+" HP."+(dmg>base*1.1?" A critical hit!":""),{hit:d,dmg,by:s});
+const { useState, useEffect, useMemo, useRef, createElement: h } = React;
+
+const CFG = {
+  cap: 150,
+  hp: [10, 100],
+  attack: [1, 50],
+  defense: [0, 50],
+  rounds: 50,
+  v: 0.15,
+  eff: 0.5
+};
+
+const SEED = [
+  { name: "Glass Cannon", hp: 40, attack: 50, defense: 5, catchphrase: "All offense, no regrets!", victory_quote: "Too fast to hit.", archetype: "Glass Cannon" },
+  { name: "Unmovable Object", hp: 100, defense: 40, attack: 8, catchphrase: "You shall not merge.", victory_quote: "I outlasted you.", archetype: "Unmovable Object" },
+  { name: "Balanced Brawler", hp: 60, attack: 45, defense: 45, catchphrase: "Even stats, even temper.", victory_quote: "Consistency wins.", archetype: "Balanced Brawler" },
+  { name: "NullPointer", hp: 70, attack: 30, defense: 40, catchphrase: "Segfault incoming.", victory_quote: "Undefined behavior.", archetype: "Tank" },
+  { name: "MergeConflict", hp: 45, attack: 40, defense: 35, catchphrase: "<<<<<<< HEAD", victory_quote: "Resolved. By me.", archetype: "Brawler" },
+  { name: "janedoe", hp: 55, attack: 48, defense: 40, catchphrase: "My first PR!", victory_quote: "Git good.", archetype: "Rookie" }
+];
+
+const MOVES = [
+  "Git Push --force", "Merge Strike", "Rebase Slam", "Cherry-Pick",
+  "Stash Smash", "Commit Crime", "Blame Beam"
+];
+
+// PROCEDURAL WEB AUDIO SYNTHESIZER
+const AudioEngine = {
+  ctx: null,
+  enabled: false,
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  play(type) {
+    if (!this.enabled || !this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      if (type === 'hit') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, t);
+        osc.frequency.exponentialRampToValueAtTime(40, t + 0.12);
+        gain.gain.setValueAtTime(0.3, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.12);
+      } else if (type === 'crit') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(240, t);
+        osc.frequency.exponentialRampToValueAtTime(30, t + 0.25);
+        gain.gain.setValueAtTime(0.35, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.25);
+      } else if (type === 'faint') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(260, t);
+        osc.frequency.linearRampToValueAtTime(60, t + 0.35);
+        gain.gain.setValueAtTime(0.2, t);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.35);
+      } else if (type === 'win') {
+        [261.63, 329.63, 392.00, 523.25].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, t + i * 0.08);
+          gain.gain.setValueAtTime(0.15, t + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.08 + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t + i * 0.08);
+          osc.stop(t + i * 0.08 + 0.22);
+        });
+      } else if (type === 'click') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, t);
+        gain.gain.setValueAtTime(0.08, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.04);
+      }
+    } catch(e) {}
   }
-  if(hp.a<=0||hp.b<=0)end="ko";
- }
- let w;
- if(end)w=hp.a>0?"a":"b";
- else{P("turn","Time's up! The judges compare remaining HP.");
-  const pa=hp.a/a.hp,pb=hp.b/b.hp;w=pa>pb?"a":pb>pa?"b":(r()<.5?"a":"b")}
- const l=w==="a"?"b":"a";
- P("faint",F[l].name+" fainted!",{out:l});
- P("end",F[w].name+': "'+(F[w].victory_quote||F[w].catchphrase)+'"',{win:w});
- return{a,b,winner:F[w],events:ev}}
-function tournament(fs,seed){
- const r=rng(seed),arr=fs.slice();
- for(let i=arr.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
- let size=1;while(size<arr.length)size*=2;
- let cur=Array(size).fill(null);
- arr.forEach((f,i)=>{cur[i<size/2?2*i:2*(i-size/2)+1]=f});
- const rounds=[],tree=[];let fi=0;
- while(cur.length>1){const ms=[],nx=[],nodes=[];
-  for(let i=0;i<cur.length;i+=2){const a=cur[i],b=cur[i+1];
-   if(!a||!b){const w=a||b;nodes.push({a,b,w,idx:-1});nx.push(w);continue}
-   const m=fight(a,b,r);ms.push(m);nodes.push({a,b,w:m.winner,idx:fi++});nx.push(m.winner)}
-  rounds.push(ms);tree.push(nodes);cur=nx}
- return{rounds,tree,champion:cur[0],flat:rounds.flatMap((ms,ri)=>ms.map(m=>({...m,ri})))}}
+};
 
-function Sprite({f,side,fainted,ev,ei}){
- const hit=ev.hit===(side==="o"?ev.oSide:ev.pSide);
- const lunge=ev.k==="hit"&&ev.by===(side==="o"?ev.oSide:ev.pSide);
- const cls="sp "+side+(fainted?" fainted":"");
- const inner="av"+(hit?" hit":"")+(lunge?" lunge-"+side:"");
- return h("div",{className:cls},
-  hit&&h("div",{className:"dmg",key:"d"+ei},"-"+ev.dmg),
-  h("div",{className:inner,key:"a"+ei,style:{background:"radial-gradient(circle at 35% 30%,hsl("+hue(f.name)+",80%,75%),hsl("+hue(f.name)+",65%,45%))"}},ICON(f.archetype||"")),
-  h("div",{className:"nm"},f.name))}
-function Info({f,hp,side}){
- const pct=Math.max(0,hp/f.hp*100),col=pct>50?"#4ade80":pct>20?"#facc15":"#ef4444";
- return h("div",{className:"info "+side},
-  h("b",null,h("span",null,f.name),h("small",null,f.archetype||"")),
-  h("div",{className:"bar"},h("i",{style:{width:pct+"%",background:col}})),
-  h("small",null,"HP "+hp+" / "+f.hp+"   ATK "+f.attack+"   DEF "+f.defense))}
+function rng(s) {
+  return () => {
+    s |= 0;
+    s = (s + 0x6D2B79F5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-function Bracket({T,rev}){
- const tree=T.tree,R=tree.length,P=66,W=170,G=56,H=52;
- const dec=(r,i)=>{const n=tree[r][i];return n.idx<0||n.idx<=rev};
- const vis=(r,i)=>r===0||(dec(r-1,2*i)&&dec(r-1,2*i+1));
- const cy=(r,i)=>P*Math.pow(2,r)*(i+.5),X=r=>r*(W+G)+8;
- const total=P*tree[0].length,width=X(R)+W+8;
- const cut=t=>t.length>20?t.slice(0,19)+"…":t;
- const els=[];
- tree.forEach((nodes,r)=>nodes.forEach((n,i)=>{
-  const y=cy(r,i),x=X(r),d=dec(r,i),v=vis(r,i),cur=n.idx===rev;
-  if(r<R-1){const x1=x+W,x2=X(r+1),y2=cy(r+1,i>>1),xm=x1+G/2;
-   els.push(h("path",{key:"c"+r+"_"+i,d:"M"+x1+" "+y+"H"+xm+"V"+y2+"H"+x2,fill:"none",stroke:cur?"#ffd75e":d&&v?"#4ade80":"#3a4566",strokeWidth:cur?4:2}))}
-  els.push(h("rect",{key:"b"+r+"_"+i,x,y:y-H/2,width:W,height:H,rx:6,fill:"#1a2238",stroke:cur?"#ffd75e":"#3a4566",strokeWidth:cur?3:1.5}));
-  [n.a,n.b].forEach((f,k)=>{
-   const won=d&&v&&f&&f===n.w,lost=d&&v&&f&&f!==n.w,ry=y-H/2+k*(H/2);
-   const label=!v?"TBD":f?f.name:"BYE";
-   if(won)els.push(h("rect",{key:"w"+r+"_"+i+k,x:x+2,y:ry+2,width:W-4,height:H/2-4,rx:4,fill:"#1e8f4e"}));
-   els.push(h("text",{key:"t"+r+"_"+i+k,x:x+10,y:ry+H/4+5,fontSize:14,fontWeight:won?800:600,fill:"#fff",opacity:lost||!v||!f?.45:1,textDecoration:lost?"line-through":"none"},cut(label)));
-   if(won)els.push(h("text",{key:"k"+r+"_"+i+k,x:x+W-20,y:ry+H/4+5,fontSize:14,fill:"#fff"},"✓"))})}));
- const fin=dec(R-1,0),fy=cy(R-1,0);
- els.push(h("rect",{key:"champ",x:X(R),y:fy-H/2,width:W,height:H,rx:6,fill:fin?"#7a5b00":"#1a2238",stroke:"#ffd75e",strokeWidth:fin?3:1.5}));
- els.push(h("text",{key:"champt",x:X(R)+10,y:fy+5,fontSize:15,fontWeight:800,fill:"#fff"},fin?"👑 "+cut(tree[R-1][0].w.name):"Champion"));
- return h("svg",{viewBox:"0 0 "+width+" "+total,preserveAspectRatio:"xMidYMid meet",role:"img","aria-label":"Tournament bracket"},els)}
+function check(o) {
+  if (!o || typeof o !== "object") return "Fighter must be a JSON object.";
+  if (typeof o.name !== "string" || !o.name.trim() || o.name.length > 24) return "name must be text, 1 to 24 characters.";
+  for (const k of ["hp", "attack", "defense"]) {
+    const [lo, hi] = CFG[k];
+    if (!Number.isInteger(o[k])) return k + " must be a whole number.";
+    if (o[k] < lo || o[k] > hi) return k + " must be between " + lo + " and " + hi + ".";
+  }
+  const t = o.hp + o.attack + o.defense;
+  if (t > CFG.cap) return "Stats total " + t + ", which is " + (t - CFG.cap) + " over the cap of " + CFG.cap + ".";
+  if (typeof o.catchphrase !== "string" || !o.catchphrase || o.catchphrase.length > 80) return "catchphrase must be text, up to 80 characters.";
+  return null;
+}
 
-function App(){
- const[fighters,setF]=useState([]);
- const[seed,setSeed]=useState(2024);
- const[mi,setMi]=useState(0),[ei,setEi]=useState(0);
- const[showB,setShowB]=useState(false);
- const[play,setPlay]=useState(false),[speed,setSpeed]=useState(1);
- const[adding,setAdding]=useState(false),[txt,setTxt]=useState(JSON.stringify({name:"Your Name",hp:50,attack:25,defense:25,catchphrase:"Say something memorable!",archetype:"Balanced Brawler"},null,2)),[err,setErr]=useState("");
- 
- useEffect(()=>{
-  fetch('/api/fighters')
-   .then(r=>r.json())
-   .then(data=>{
-    if(data.length>0)setF(data);
-    else setF(SEED);
-   })
-   .catch(e=>setF(SEED));
- },[]);
+function fight(a, b, r) {
+  const F = { a, b }, hp = { a: a.hp, b: b.hp }, ev = [];
+  const P = (k, t, x) => ev.push({ k, t, hpA: hp.a, hpB: hp.b, ...x });
+  P("enter", a.name + ': "' + a.catchphrase + '"');
+  P("enter", b.name + ': "' + b.catchphrase + '"');
+  let end = null;
+  for (let n = 1; n <= CFG.rounds && !end; n++) {
+    P("turn", "Turn " + n);
+    const first = a.attack > b.attack || (a.attack === b.attack && r() < 0.5) ? ["a", "b"] : ["b", "a"];
+    for (const s of first) {
+      if (hp.a <= 0 || hp.b <= 0) break;
+      const d = s === "a" ? "b" : "a", at = F[s], df = F[d];
+      const base = Math.max(1, Math.round(at.attack - df.defense * CFG.eff));
+      const dmg = Math.max(1, Math.round(base * (1 - CFG.v + 2 * CFG.v * r())));
+      const isCrit = dmg > base * 1.1;
+      const move = MOVES[Math.floor(r() * MOVES.length)];
+      hp[d] = Math.max(0, hp[d] - dmg);
+      P("hit", at.name + " used " + move + "! " + df.name + " lost " + dmg + " HP." + (isCrit ? " [Critical]" : ""), {
+        hit: d,
+        dmg,
+        by: s,
+        move,
+        isCrit
+      });
+    }
+    if (hp.a <= 0 || hp.b <= 0) end = "ko";
+  }
+  let w;
+  if (end) w = hp.a > 0 ? "a" : "b";
+  else {
+    P("turn", "Time limit reached. Comparing remaining HP percentage.");
+    const pa = hp.a / a.hp, pb = hp.b / b.hp;
+    w = pa > pb ? "a" : pb > pa ? "b" : (r() < 0.5 ? "a" : "b");
+  }
+  const l = w === "a" ? "b" : "a";
+  P("faint", F[l].name + " is defeated.", { out: l });
+  P("end", F[w].name + ': "' + (F[w].victory_quote || F[w].catchphrase) + '"', { win: w });
+  return { a, b, winner: F[w], events: ev };
+}
 
- const T=useMemo(()=>tournament(fighters,seed),[fighters,seed]);
- const ms=T.flat,m=ms[mi];
- const logRef=useRef(null);
- const last=m&&mi===ms.length-1&&ei===m.events.length-1;
- useEffect(()=>{
-  if(!play||!m)return;
-  const ev=m.events[ei],fin=ei===m.events.length-1,lastM=mi===ms.length-1;
-  const d=showB?3400/speed:{enter:1300,turn:450,hit:1050,faint:1300,end:1900}[ev.k]/speed;
-  const t=setTimeout(()=>{
-   if(showB){setShowB(false);setMi(mi+1);setEi(0)}
-   else if(fin){setShowB(true);if(lastM)setPlay(false)}
-   else setEi(ei+1)},d);
-  return()=>clearTimeout(t)},[play,mi,ei,speed,m,ms.length,showB]);
- useEffect(()=>{if(logRef.current)logRef.current.scrollTop=logRef.current.scrollHeight},[mi,ei]);
- const reset=s=>{setShowB(false);setMi(0);setEi(0);setPlay(false);if(s!=null)setSeed(s)};
- const skip=()=>{if(mi<ms.length-1){setShowB(false);setMi(mi+1);setEi(0)}};
- const add=()=>{
-  let o;try{o=JSON.parse(txt)}catch(e){return setErr("That is not valid JSON: "+e.message)}
-  const p=check(o);if(p)return setErr(p);
-  if(fighters.some(f=>f.name.toLowerCase()===o.name.toLowerCase()))return setErr("A fighter with that name already exists.");
-  setF([...fighters,o]);setErr("");reset()};
- const out=new Set();
- ms.forEach((x,i)=>{if(i<mi||(i===mi&&m&&m.events.slice(0,ei+1).some(e=>e.k==="faint")))out.add(x.winner===x.a?x.b.name:x.a.name)});
- if(last)out.delete(T.champion.name);
- let scene;
- if(!m){scene=h("div",{className:"scene"},h("div",{className:"banner"},h("h2",null,T.champion?"Champion":"Add fighters"),h("p",null,T.champion?T.champion.name+" wins by default.":"Add at least one fighter.")))}
- else{
-  const ev={...m.events[ei],oSide:"b",pSide:"a"};
-  const fa=m.events.slice(0,ei+1).find(e=>e.k==="faint");
-  scene=h("div",{className:"scene"},
-   h("div",{className:"pad o"}),h("div",{className:"pad p"}),
-   h(Sprite,{f:m.b,side:"o",fainted:fa&&fa.out==="b",ev,ei}),
-   h(Sprite,{f:m.a,side:"p",fainted:fa&&fa.out==="a",ev,ei}),
-   h(Info,{f:m.b,hp:ev.hpB,side:"o"}),h(Info,{f:m.a,hp:ev.hpA,side:"p"}),
-   showB&&h("div",{className:"bov"},h("h2",null,last?"Final: "+T.champion.name+" wins the tournament":"Round "+(m.ri+1)+": "+m.winner.name+" advances"),h(Bracket,{T,rev:mi})))}
- const lines=m?m.events.slice(0,ei+1):[];
- return h("div",{className:"wrap"},
-  h("h1",null,"JSON Auto-Battler Arena"),
-  h("div",{className:"grid"},
-   h("div",null,
-    scene,
-    h("div",{className:"ctl"},
-     h("button",{className:"btn pri",onClick:()=>{if(last||!m){reset()}setPlay(p=>!p)}},play?"Pause":last?"Replay":mi===0&&ei===0?"Start battle":"Resume"),
-     h("button",{className:"btn",onClick:skip,disabled:!m||mi>=ms.length-1},"Skip match"),
-     [1,2,4].map(s=>h("button",{key:s,className:"btn"+(speed===s?" on":""),onClick:()=>setSpeed(s)},s+"x")),
-     h("button",{className:"btn",onClick:()=>reset(Math.floor(Math.random()*1e6))},"Reshuffle bracket"),
-     h("button",{className:"btn"+(adding?" on":""),onClick:()=>setAdding(a=>!a)},"Add fighter")),
-    h("div",{className:"log",ref:logRef,"aria-live":"polite"},
-     lines.length?lines.map((e,i)=>h("p",{key:i,className:e.k==="turn"?"turn":e.k==="hit"?"hit-l":e.k==="end"?"win":""},e.t)):h("p",{className:"st"},"Press Start battle to begin. Seed "+seed+"."))),
-   h("div",{className:"side"},
-    h("div",{className:"panel"},h("h3",null,"Bracket"),
-     T.rounds.map((r,ri)=>h("div",{key:ri,style:{marginBottom:8}},
-      h("div",{className:"st"},ri===T.rounds.length-1?"Final":"Round "+(ri+1)),
-      r.map((x,i)=>{const idx=ms.indexOf(ms.find(y=>y===x||(y.a===x.a&&y.b===x.b&&y.ri===ri)));
-       const done=idx<mi||(idx===mi&&last)||(idx===mi&&m.events.slice(0,ei+1).some(e=>e.k==="end"));
-       return h("div",{key:i,className:"m"+(idx===mi?" cur":"")},
-        done?h("b",null,x.winner.name):x.a.name+" vs "+x.b.name,done?" beat "+(x.winner===x.a?x.b.name:x.a.name):"")}))) ),
-    h("div",{className:"panel"},h("h3",null,"Roster ("+fighters.length+")"),
-     fighters.map(f=>h("div",{key:f.name,className:"row"+(out.has(f.name)?" out":"")},
-      h("span",null,ICON(f.archetype||"")+" "+f.name),h("span",{className:"st"},f.hp+"/"+f.attack+"/"+f.defense)))),
-    adding&&h("div",{className:"panel"},h("h3",null,"New fighter (JSON)"),
-     h("textarea",{value:txt,onChange:e=>setTxt(e.target.value),spellCheck:false,"aria-label":"Fighter JSON"}),
-     err&&h("div",{className:"err",role:"alert"},err),
-     h("div",{className:"ctl"},h("button",{className:"btn pri",onClick:add},"Add to roster")),
-     h("div",{className:"st"},"Stats must total "+CFG.cap+" or less.")))))}
+function tournament(fs, seed) {
+  const r = rng(seed), arr = fs.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(r() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  let size = 1;
+  while (size < arr.length) size *= 2;
+  let cur = Array(size).fill(null);
+  arr.forEach((f, i) => { cur[i < size / 2 ? 2 * i : 2 * (i - size / 2) + 1] = f; });
+  const rounds = [], tree = [];
+  let fi = 0;
+  while (cur.length > 1) {
+    const ms = [], nx = [], nodes = [];
+    for (let i = 0; i < cur.length; i += 2) {
+      const a = cur[i], b = cur[i + 1];
+      if (!a || !b) {
+        const w = a || b;
+        nodes.push({ a, b, w, idx: -1 });
+        nx.push(w);
+        continue;
+      }
+      const m = fight(a, b, r);
+      ms.push(m);
+      nodes.push({ a, b, w: m.winner, idx: fi++ });
+      nx.push(m.winner);
+    }
+    rounds.push(ms);
+    tree.push(nodes);
+    cur = nx;
+  }
+  return {
+    rounds,
+    tree,
+    champion: cur[0],
+    flat: rounds.flatMap((ms, ri) => ms.map(m => ({ ...m, ri })))
+  };
+}
+
+// MATTE VECTOR FIGHTER SPRITE RENDERER
+function FighterAvatar({ fighter, side }) {
+  const name = fighter?.name || "Fighter";
+  const arch = (fighter?.archetype || "").toLowerCase();
+  
+  const hash = [...name].reduce((acc, c) => (acc * 31 + c.charCodeAt(0)) % 360, 20);
+  const primaryColor = `hsl(${hash}, 65%, 48%)`;
+  const secondaryColor = `hsl(${(hash + 40) % 360}, 60%, 38%)`;
+  
+  const isTank = arch.includes("tank") || arch.includes("unmov");
+  const isGlass = arch.includes("glass") || arch.includes("cannon");
+  const isBrawler = arch.includes("brawl") || arch.includes("balanc");
+
+  return h("div", { className: "av-chassis" },
+    h("svg", {
+      className: "av-svg",
+      viewBox: "0 0 100 100",
+      fill: "none",
+      xmlns: "http://www.w3.org/2000/svg"
+    },
+      // Torso armor
+      h("path", {
+        d: isTank ? "M28 35 L72 35 L80 82 L20 82 Z" : isGlass ? "M34 38 L66 38 L74 84 L26 84 Z" : "M30 36 L70 36 L76 82 L24 82 Z",
+        fill: primaryColor,
+        stroke: "#0a0e17",
+        strokeWidth: 3
+      }),
+      // Core armor plate
+      h("path", {
+        d: "M40 45 L60 45 L54 68 L46 68 Z",
+        fill: secondaryColor
+      }),
+      // Helmet / Visor base
+      h("rect", {
+        x: 35,
+        y: 18,
+        width: 30,
+        height: 22,
+        rx: isTank ? 3 : 6,
+        fill: "#182030",
+        stroke: primaryColor,
+        strokeWidth: 2.5
+      }),
+      // Slit
+      h("path", {
+        d: isGlass ? "M38 28 L62 28" : "M40 29 L60 29",
+        stroke: isGlass ? "#f43f5e" : isTank ? "#10b981" : "#0284c7",
+        strokeWidth: 3,
+        strokeLinecap: "round"
+      }),
+      // Gear / Shield / Blade
+      isTank && h("g", { transform: side === "p" ? "translate(60, 32)" : "translate(12, 32)" },
+        h("path", { d: "M4 0 L24 0 L26 36 L14 46 L2 36 Z", fill: "#334155", stroke: "#10b981", strokeWidth: 2 }),
+        h("circle", { cx: 14, cy: 22, r: 4, fill: "#10b981" })
+      ),
+      isGlass && h("g", { transform: side === "p" ? "translate(68, 26)" : "translate(8, 26)" },
+        h("path", { d: "M10 2 L14 18 L18 48 L10 40 L6 18 Z", fill: "#f43f5e", stroke: "#fff", strokeWidth: 1.5 }),
+        h("line", { x1: 10, y1: 0, x2: 14, y2: 44, stroke: "#fbbf24", strokeWidth: 2 })
+      ),
+      isBrawler && h("g", { transform: side === "p" ? "translate(64, 46)" : "translate(12, 46)" },
+        h("circle", { cx: 12, cy: 12, r: 11, fill: secondaryColor, stroke: "#fff", strokeWidth: 2 }),
+        h("path", { d: "M5 12 L19 12", stroke: "#f59e0b", strokeWidth: 2.5 })
+      )
+    ),
+    h("div", { className: "sprite-shadow" })
+  );
+}
+
+function Sprite({ f, side, fainted, ev, ei }) {
+  const isHit = ev.hit === (side === "o" ? ev.oSide : ev.pSide);
+  const isLunge = ev.k === "hit" && ev.by === (side === "o" ? ev.oSide : ev.pSide);
+  const cls = "sp " + side + (fainted ? " fainted" : "");
+  const actorCls = "sprite-actor" + (isHit ? " hit" : "") + (isLunge ? " lunge-" + side : "");
+
+  return h("div", { className: cls },
+    isHit && h("div", { className: "dmg-pop", key: "d" + ei }, "-" + ev.dmg),
+    h("div", { className: actorCls, key: "a" + ei },
+      h(FighterAvatar, { fighter: f, side })
+    ),
+    h("div", { className: "nm-tag" }, f.name)
+  );
+}
+
+function Info({ f, hp, side }) {
+  const pct = Math.max(0, Math.round((hp / f.hp) * 100));
+  const colorClass = pct > 50 ? "green" : pct > 20 ? "yellow" : "red";
+
+  return h("div", { className: "hud-card " + side },
+    h("div", { className: "hud-header" },
+      h("span", { className: "hud-name" }, f.name),
+      h("span", { className: "hud-archetype" }, f.archetype || "Duelist")
+    ),
+    h("div", { className: "hp-gauge" },
+      h("div", { className: "hp-gauge-ghost", style: { width: pct + "%" } }),
+      h("div", { className: "hp-gauge-fill " + colorClass, style: { width: pct + "%" } })
+    ),
+    h("div", { className: "hud-stats-row" },
+      h("span", null, "ATK " + f.attack + " · DEF " + f.defense),
+      h("span", { className: "hud-hp-nums" }, hp + " / " + f.hp + " HP")
+    )
+  );
+}
+
+function BracketSVG({ T, rev, isLight }) {
+  const tree = T.tree, R = tree.length, P = 68, W = 168, G = 54, H = 50;
+  const dec = (r, i) => { const n = tree[r][i]; return n.idx < 0 || n.idx <= rev; };
+  const vis = (r, i) => r === 0 || (dec(r - 1, 2 * i) && dec(r - 1, 2 * i + 1));
+  const cy = (r, i) => P * Math.pow(2, r) * (i + 0.5), X = r => r * (W + G) + 10;
+  const total = P * tree[0].length, width = X(R) + W + 12;
+  const cut = t => t.length > 18 ? t.slice(0, 17) + "…" : t;
+  const els = [];
+
+  const pathDefault = isLight ? "#cbd5e1" : "#242c44";
+  const pathActive = "#0284c7";
+  const pathDecided = isLight ? "#d97706" : "#e5a93c";
+
+  const boxFill = isLight ? "#ffffff" : "#131a28";
+  const boxBorder = isLight ? "#cbd5e1" : "#222c40";
+  const textColor = isLight ? "#0f172a" : "#f1f5f9";
+  const winColor = isLight ? "#059669" : "#10b981";
+
+  tree.forEach((nodes, r) => nodes.forEach((n, i) => {
+    const y = cy(r, i), x = X(r), d = dec(r, i), v = vis(r, i), cur = n.idx === rev;
+    if (r < R - 1) {
+      const x1 = x + W, x2 = X(r + 1), y2 = cy(r + 1, i >> 1), xm = x1 + G / 2;
+      els.push(h("path", {
+        key: "c" + r + "_" + i,
+        d: "M" + x1 + " " + y + "H" + xm + "V" + y2 + "H" + x2,
+        fill: "none",
+        stroke: cur ? pathActive : d && v ? pathDecided : pathDefault,
+        strokeWidth: cur ? 2.5 : 1.5
+      }));
+    }
+    els.push(h("rect", {
+      key: "b" + r + "_" + i,
+      x,
+      y: y - H / 2,
+      width: W,
+      height: H,
+      rx: 4,
+      fill: boxFill,
+      stroke: cur ? pathActive : boxBorder,
+      strokeWidth: cur ? 2 : 1
+    }));
+    [n.a, n.b].forEach((f, k) => {
+      const won = d && v && f && f === n.w, lost = d && v && f && f !== n.w, ry = y - H / 2 + k * (H / 2);
+      const label = !v ? "TBD" : f ? f.name : "BYE";
+      if (won) {
+        els.push(h("rect", {
+          key: "w" + r + "_" + i + k,
+          x: x + 2,
+          y: ry + 2,
+          width: W - 4,
+          height: H / 2 - 4,
+          rx: 2,
+          fill: isLight ? "#d1fae5" : "#10b981",
+          opacity: isLight ? 0.8 : 0.18
+        }));
+      }
+      els.push(h("text", {
+        key: "t" + r + "_" + i + k,
+        x: x + 10,
+        y: ry + H / 4 + 4,
+        fontSize: 12,
+        fontFamily: "'Chakra Petch', sans-serif",
+        fontWeight: won ? 700 : 500,
+        fill: won ? winColor : textColor,
+        opacity: lost || !v || !f ? 0.35 : 1,
+        textDecoration: lost ? "line-through" : "none"
+      }, cut(label)));
+      if (won) {
+        els.push(h("text", {
+          key: "k" + r + "_" + i + k,
+          x: x + W - 18,
+          y: ry + H / 4 + 4,
+          fontSize: 12,
+          fill: winColor
+        }, "✓"));
+      }
+    });
+  }));
+
+  const fin = dec(R - 1, 0), fy = cy(R - 1, 0);
+  els.push(h("rect", {
+    key: "champ",
+    x: X(R),
+    y: fy - H / 2,
+    width: W,
+    height: H,
+    rx: 4,
+    fill: fin ? (isLight ? "#fef3c7" : "#241e12") : boxFill,
+    stroke: fin ? (isLight ? "#d97706" : "#e5a93c") : boxBorder,
+    strokeWidth: fin ? 2 : 1
+  }));
+  els.push(h("text", {
+    key: "champt",
+    x: X(R) + 10,
+    y: fy + 5,
+    fontSize: 13,
+    fontFamily: "'Chakra Petch', sans-serif",
+    fontWeight: 700,
+    fill: fin ? (isLight ? "#b45309" : "#e5a93c") : (isLight ? "#64748b" : "#94a3b8")
+  }, fin ? "WINNER: " + cut(tree[R - 1][0].w.name) : "CHAMPION"));
+
+  return h("svg", {
+    viewBox: "0 0 " + width + " " + total,
+    preserveAspectRatio: "xMidYMid meet",
+    role: "img",
+    "aria-label": "Tournament bracket"
+  }, els);
+}
+
+function App() {
+  const [fighters, setF] = useState([]);
+  const [seed, setSeed] = useState(2024);
+  const [mi, setMi] = useState(0);
+  const [ei, setEi] = useState(0);
+  const [showB, setShowB] = useState(false);
+  const [play, setPlay] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [soundOn, setSoundOn] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [creatorMode, setCreatorMode] = useState("gui");
+
+  // Optional Light / Dark Mode state
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("arena_theme") || "dark";
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("arena_theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    AudioEngine.init();
+    AudioEngine.play('click');
+    setTheme(t => (t === "dark" ? "light" : "dark"));
+  };
+  
+  const [fName, setFName] = useState("Brawler Prime");
+  const [fHp, setFHp] = useState(60);
+  const [fAtk, setFAtk] = useState(45);
+  const [fDef, setFDef] = useState(45);
+  const [fCatch, setFCatch] = useState("Ready for the match.");
+  const [fArch, setFArch] = useState("Balanced Brawler");
+  const [txt, setTxt] = useState(JSON.stringify({
+    name: "Brawler Prime",
+    hp: 60,
+    attack: 45,
+    defense: 45,
+    catchphrase: "Ready for the match.",
+    archetype: "Balanced Brawler"
+  }, null, 2));
+  const [err, setErr] = useState("");
+
+  const logRef = useRef(null);
+
+  const toggleSound = () => {
+    AudioEngine.init();
+    AudioEngine.enabled = !soundOn;
+    setSoundOn(!soundOn);
+    if (!soundOn) AudioEngine.play('click');
+  };
+
+  useEffect(() => {
+    fetch('/api/fighters')
+      .then(r => r.json())
+      .then(data => {
+        if (data.length > 0) setF(data);
+        else setF(SEED);
+      })
+      .catch(() => setF(SEED));
+  }, []);
+
+  const T = useMemo(() => tournament(fighters, seed), [fighters, seed]);
+  const ms = T.flat, m = ms[mi];
+  const last = m && mi === ms.length - 1 && ei === m.events.length - 1;
+
+  useEffect(() => {
+    if (!play || !m) return;
+    const ev = m.events[ei];
+    const fin = ei === m.events.length - 1;
+    const lastM = mi === ms.length - 1;
+
+    if (ev.k === "hit") {
+      if (ev.isCrit) AudioEngine.play('crit');
+      else AudioEngine.play('hit');
+    } else if (ev.k === "faint") {
+      AudioEngine.play('faint');
+    } else if (ev.k === "end") {
+      AudioEngine.play('win');
+    }
+
+    const d = showB
+      ? 3000 / speed
+      : { enter: 1100, turn: 400, hit: 900, faint: 1200, end: 1600 }[ev.k] / speed;
+
+    const t = setTimeout(() => {
+      if (showB) {
+        setShowB(false);
+        setMi(mi + 1);
+        setEi(0);
+      } else if (fin) {
+        setShowB(true);
+        if (lastM) setPlay(false);
+      } else {
+        setEi(ei + 1);
+      }
+    }, d);
+
+    return () => clearTimeout(t);
+  }, [play, mi, ei, speed, m, ms.length, showB]);
+
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
+  }, [mi, ei]);
+
+  const reset = s => {
+    setShowB(false);
+    setMi(0);
+    setEi(0);
+    setPlay(false);
+    if (s != null) setSeed(s);
+  };
+
+  const skip = () => {
+    if (mi < ms.length - 1) {
+      AudioEngine.play('click');
+      setShowB(false);
+      setMi(mi + 1);
+      setEi(0);
+    }
+  };
+
+  const addFighter = () => {
+    AudioEngine.init();
+    AudioEngine.play('click');
+    let o;
+    if (creatorMode === "gui") {
+      o = {
+        name: fName.trim(),
+        hp: Number(fHp),
+        attack: Number(fAtk),
+        defense: Number(fDef),
+        catchphrase: fCatch.trim(),
+        archetype: fArch
+      };
+    } else {
+      try {
+        o = JSON.parse(txt);
+      } catch (e) {
+        return setErr("Invalid JSON: " + e.message);
+      }
+    }
+    const p = check(o);
+    if (p) return setErr(p);
+    if (fighters.some(f => f.name.toLowerCase() === o.name.toLowerCase())) {
+      return setErr("A fighter named '" + o.name + "' already exists.");
+    }
+    setF([...fighters, o]);
+    setErr("");
+    setAdding(false);
+    reset();
+  };
+
+  const out = new Set();
+  ms.forEach((x, i) => {
+    if (i < mi || (i === mi && m && m.events.slice(0, ei + 1).some(e => e.k === "faint"))) {
+      out.add(x.winner === x.a ? x.b.name : x.a.name);
+    }
+  });
+  if (last) out.delete(T.champion.name);
+
+  let scene;
+  if (!m) {
+    scene = h("div", { className: "stage" },
+      h("div", { className: "arena-grid-floor" }),
+      h("div", { className: "banner-welcome" },
+        h("h2", null, T.champion ? "CHAMPION: " + T.champion.name : "ARENA EMPTY"),
+        h("p", null, T.champion ? "Tournament finished. Reshuffle bracket to run a new tournament." : "Add fighters to start the tournament.")
+      )
+    );
+  } else {
+    const ev = { ...m.events[ei], oSide: "b", pSide: "a" };
+    const fa = m.events.slice(0, ei + 1).find(e => e.k === "faint");
+    
+    scene = h("div", { className: "stage" },
+      h("div", { className: "arena-grid-floor" }),
+      h("div", { className: "ring-center-line" }, "ARENA STAGE"),
+      
+      ev.k === "hit" && h("div", { className: "action-banner" + (ev.isCrit ? " crit" : "") },
+        h("span", { className: "move-tag" }, "MOVE"),
+        h("span", { className: "move-title" }, ev.move),
+        ev.isCrit && h("span", { className: "crit-label" }, "CRITICAL")
+      ),
+
+      h("div", { className: "pad o" }),
+      h("div", { className: "pad p" }),
+
+      h(Sprite, { f: m.b, side: "o", fainted: fa && fa.out === "b", ev, ei }),
+      h(Sprite, { f: m.a, side: "p", fainted: fa && fa.out === "a", ev, ei }),
+
+      h(Info, { f: m.b, hp: ev.hpB, side: "o" }),
+      h(Info, { f: m.a, hp: ev.hpA, side: "p" }),
+
+      showB && h("div", { className: "stage-overlay" },
+        h("div", { className: "stage-overlay-header" },
+          h("h3", { className: "stage-overlay-title" },
+            last ? "GRAND FINAL: " + T.champion.name + " WINS TOURNAMENT" : "ROUND " + (m.ri + 1) + ": " + m.winner.name + " ADVANCES"
+          ),
+          h("span", { style: { color: "var(--text-dim)", fontSize: 12, fontWeight: 700 } }, "Next match starting...")
+        ),
+        h(BracketSVG, { T, rev: mi, isLight: theme === "light" })
+      )
+    );
+  }
+
+  const lines = m ? m.events.slice(0, ei + 1) : [];
+  const statTotal = Number(fHp) + Number(fAtk) + Number(fDef);
+
+  return h("div", { className: "wrap" },
+    h("header", { className: "top-bar" },
+      h("div", { className: "brand-group" },
+        h("div", { className: "brand-emblem" }, "AB"),
+        h("div", null,
+          h("h1", { className: "brand-title" }, "JSON Auto-Battler Arena"),
+          h("div", { className: "brand-subtitle" }, "Seed #" + seed + " · " + fighters.length + " Fighters")
+        )
+      ),
+      h("div", { className: "header-actions" },
+        h("button", {
+          className: "control-btn",
+          onClick: toggleTheme,
+          "aria-label": "Toggle color mode"
+        }, theme === "dark" ? "Theme: Dark" : "Theme: Light"),
+        h("button", {
+          className: "control-btn" + (soundOn ? " active" : ""),
+          onClick: toggleSound,
+          "aria-label": "Toggle sound"
+        }, soundOn ? "Sound: On" : "Sound: Off")
+      )
+    ),
+
+    h("div", { className: "layout-grid" },
+      h("main", null,
+        h("div", { className: "arena-wrapper" },
+          scene,
+          h("div", { className: "console-deck" },
+            h("button", {
+              className: "arcade-btn primary",
+              onClick: () => {
+                AudioEngine.init();
+                AudioEngine.play('click');
+                if (last || !m) reset();
+                setPlay(p => !p);
+              }
+            }, play ? "Pause" : last ? "Replay" : mi === 0 && ei === 0 ? "Start Battle" : "Resume"),
+            h("button", {
+              className: "arcade-btn",
+              onClick: skip,
+              disabled: !m || mi >= ms.length - 1
+            }, "Skip Match"),
+            h("div", { className: "speed-selector" },
+              [1, 2, 4].map(s => h("button", {
+                key: s,
+                className: "speed-tab" + (speed === s ? " active" : ""),
+                onClick: () => {
+                  AudioEngine.init();
+                  AudioEngine.play('click');
+                  setSpeed(s);
+                }
+              }, s + "x"))
+            ),
+            h("button", {
+              className: "arcade-btn",
+              onClick: () => {
+                AudioEngine.init();
+                AudioEngine.play('click');
+                reset(Math.floor(Math.random() * 1e6));
+              }
+            }, "Reshuffle"),
+            h("button", {
+              className: "arcade-btn" + (adding ? " primary" : ""),
+              onClick: () => {
+                AudioEngine.init();
+                AudioEngine.play('click');
+                setAdding(a => !a);
+              }
+            }, adding ? "Close Studio" : "Add Fighter")
+          ),
+
+          h("div", { className: "log-box", ref: logRef, "aria-live": "polite" },
+            lines.length
+              ? lines.map((e, i) => {
+                  let cls = "log-line";
+                  if (e.k === "turn") cls += " turn-marker";
+                  else if (e.k === "hit") cls += e.isCrit ? " crit-event" : " hit-event";
+                  else if (e.k === "end") cls += " victory-event";
+                  return h("div", { key: i, className: cls },
+                    h("span", null, "•"),
+                    h("span", null, e.t)
+                  );
+                })
+              : h("div", { className: "log-line", style: { color: "var(--text-dim)" } },
+                  "Arena ready. Press 'Start Battle' to begin."
+                )
+          )
+        )
+      ),
+
+      h("aside", { className: "side-deck" },
+        h("div", { className: "panel-card" },
+          h("div", { className: "panel-title" },
+            h("span", null, "Tournament Standings"),
+            h("span", { style: { color: "var(--accent-amber)", fontSize: 11 } }, "ACTIVE")
+          ),
+          T.rounds.map((r, ri) => h("div", { key: ri, className: "bracket-mini-round" },
+            h("div", { className: "round-label" }, ri === T.rounds.length - 1 ? "Grand Final" : "Round " + (ri + 1)),
+            r.map((x, i) => {
+              const idx = ms.indexOf(ms.find(y => y === x || (y.a === x.a && y.b === x.b && y.ri === ri)));
+              const done = idx < mi || (idx === mi && last) || (idx === mi && m.events.slice(0, ei + 1).some(e => e.k === "end"));
+              return h("div", { key: i, className: "match-card" + (idx === mi ? " current" : "") },
+                done
+                  ? h("span", { className: "winner-mark" }, "✓ " + x.winner.name)
+                  : h("span", null, x.a.name + " vs " + x.b.name)
+              );
+            })
+          ))
+        ),
+
+        h("div", { className: "panel-card" },
+          h("div", { className: "panel-title" },
+            h("span", null, "Fighter Roster"),
+            h("span", { style: { color: "var(--text-dim)", fontSize: 11 } }, fighters.length + " fighters")
+          ),
+          h("div", { className: "roster-scroll" },
+            fighters.map(f => h("div", {
+              key: f.name,
+              className: "roster-row" + (out.has(f.name) ? " eliminated" : "")
+            },
+              h("div", { className: "fighter-badge" },
+                h("span", null, f.name)
+              ),
+              h("div", { className: "stats-triad" },
+                h("span", null, "HP " + f.hp),
+                h("span", null, "ATK " + f.attack),
+                h("span", null, "DEF " + f.defense)
+              )
+            ))
+          )
+        ),
+
+        adding && h("div", { className: "panel-card creator-deck" },
+          h("div", { className: "panel-title" },
+            h("span", null, "Fighter Studio"),
+            h("div", { style: { display: "flex", gap: 4 } },
+              h("button", {
+                className: "speed-tab" + (creatorMode === "gui" ? " active" : ""),
+                onClick: () => setCreatorMode("gui")
+              }, "Sliders"),
+              h("button", {
+                className: "speed-tab" + (creatorMode === "json" ? " active" : ""),
+                onClick: () => setCreatorMode("json")
+              }, "JSON")
+            )
+          ),
+          creatorMode === "gui" ? h("div", { style: { display: "flex", flexDirection: "column", gap: 10 } },
+            h("div", null,
+              h("div", { className: "slider-header", style: { marginBottom: 3 } }, "Fighter Name"),
+              h("input", {
+                className: "form-input",
+                value: fName,
+                maxLength: 24,
+                onChange: e => setFName(e.target.value),
+                placeholder: "e.g. Ironclad"
+              })
+            ),
+            h("div", { className: "slider-group" },
+              h("div", { className: "slider-header" }, h("span", null, "Health Points (HP)"), h("b", null, fHp)),
+              h("input", {
+                type: "range",
+                min: 10,
+                max: 100,
+                value: fHp,
+                onChange: e => setFHp(Number(e.target.value))
+              })
+            ),
+            h("div", { className: "slider-group" },
+              h("div", { className: "slider-header" }, h("span", null, "Attack Power"), h("b", null, fAtk)),
+              h("input", {
+                type: "range",
+                min: 1,
+                max: 50,
+                value: fAtk,
+                onChange: e => setFAtk(Number(e.target.value))
+              })
+            ),
+            h("div", { className: "slider-group" },
+              h("div", { className: "slider-header" }, h("span", null, "Defense"), h("b", null, fDef)),
+              h("input", {
+                type: "range",
+                min: 0,
+                max: 50,
+                value: fDef,
+                onChange: e => setFDef(Number(e.target.value))
+              })
+            ),
+            h("div", { className: "stat-budget-meter" + (statTotal > CFG.cap ? " over" : "") },
+              h("span", null, "Total Stats (Cap 150)"),
+              h("span", null, statTotal + " / " + CFG.cap)
+            ),
+            h("div", null,
+              h("div", { className: "slider-header", style: { marginBottom: 3 } }, "Catchphrase"),
+              h("input", {
+                className: "form-input",
+                value: fCatch,
+                maxLength: 80,
+                onChange: e => setFCatch(e.target.value),
+                placeholder: "Pre-battle quote"
+              })
+            ),
+            h("div", null,
+              h("div", { className: "slider-header", style: { marginBottom: 3 } }, "Archetype"),
+              h("select", {
+                className: "form-input",
+                value: fArch,
+                onChange: e => setFArch(e.target.value)
+              },
+                h("option", { value: "Balanced Brawler" }, "Balanced Brawler"),
+                h("option", { value: "Glass Cannon" }, "Glass Cannon"),
+                h("option", { value: "Unmovable Object" }, "Unmovable Object / Tank"),
+                h("option", { value: "Rookie" }, "Rookie / Striker")
+              )
+            )
+          ) : h("div", null,
+            h("textarea", {
+              className: "json-area",
+              value: txt,
+              onChange: e => setTxt(e.target.value),
+              spellCheck: false,
+              "aria-label": "Raw JSON config"
+            })
+          ),
+          err && h("div", { className: "error-msg", role: "alert" }, err),
+          h("button", {
+            className: "arcade-btn primary",
+            style: { width: "100%", justifyContent: "center", marginTop: 4 },
+            onClick: addFighter
+          }, "Enter Tournament")
+        )
+      )
+    )
+  );
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(h(App));
 </script>
 </body>

@@ -1,0 +1,11 @@
+{
+  "name": "json-auto-battler-arena",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simulated tournament auto-battler arena for custom JSON fighters.",
+  "scripts": {
+    "dev": "python3 server.py",
+    "build": "python3 -c \"import server, validate, battle; print('Build check OK')\"",
+    "start": "python3 server.py"
+  }
+}
