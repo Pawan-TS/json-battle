@@ -1,4 +1,4 @@
-# ⚔️ JSON Auto-Battler Arena
+# JSON Auto-Battler Arena
 
 Welcome to the **JSON Auto-Battler Arena**! A lightweight, zero-dependency battle simulator where participants create custom fighters using simple JSON files and pit them against each other in an automated knockout tournament.
 
@@ -6,14 +6,14 @@ Includes both a **Python CLI engine** and an interactive **Web UI Tournament Vis
 
 ---
 
-## 🚀 Quick Start for Participants
+## Quick Start for Participants
 
 1. **Fork** this repository.
 2. **Copy the template** into `fighters/<your-github-handle>.json`:
    ```bash
    cp fighters/_template.json fighters/<your-github-handle>.json
    ```
-   > ⚠️ **Note:** Do not modify `fighters/_template.json` or `config.json`.
+   > **Note:** Do not modify `fighters/_template.json` or `config.json`.
 3. **Customize your fighter** in `fighters/<your-github-handle>.json`:
    ```json
    {
@@ -34,7 +34,7 @@ Includes both a **Python CLI engine** and an interactive **Web UI Tournament Vis
 
 ---
 
-## 📊 Fighter Specification & Stat Limits
+## Fighter Specification & Stat Limits
 
 Your fighter's stats must strictly comply with the arena rules:
 
@@ -53,7 +53,7 @@ Your fighter's stats must strictly comply with the arena rules:
 
 ---
 
-## 🛡️ Combat Mechanics
+## Combat Mechanics
 
 The battle engine simulates turn-based rounds until one fighter is knocked out (HP reaches 0) or maximum rounds are reached:
 
@@ -71,7 +71,7 @@ The battle engine simulates turn-based rounds until one fighter is knocked out (
 
 ---
 
-## 💡 Archetype Inspiration
+## Archetype Inspiration
 
 Need inspiration for your build? Here are classic strategies (all total 150 stats):
 
@@ -81,7 +81,7 @@ Need inspiration for your build? Here are classic strategies (all total 150 stat
 
 ---
 
-## 🎮 Running the Arena
+## Running the Arena
 
 ### 1. Web UI Tournament Visualizer (Recommended)
 Start the local server:
