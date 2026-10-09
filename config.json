@@ -7,6 +7,6 @@
   "catchphrase_max_length": 80,
   "max_rounds": 50,
   "damage_variance": 0.15,
-  "defense_effectiveness": 0.5,
+  "defense_k": 50,
   "organizer_handles": []
 }

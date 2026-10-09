@@ -40,7 +40,7 @@ def simulate_match(f1, f2, config, rng):
     
     max_rounds = config.get("max_rounds", 50)
     variance = config.get("damage_variance", 0.15)
-    def_eff = config.get("defense_effectiveness", 0.5)
+    defense_k = config.get("defense_k", 50)
     
     for r in range(1, max_rounds + 1):
         if f1["attack"] > f2["attack"]:
@@ -62,7 +62,9 @@ def simulate_match(f1, f2, config, rng):
                 is_f1_first = False
                 
         def strike(attacker, defender, def_hp):
-            base = attacker["attack"] - defender["defense"] * def_eff
+            armor = max(0, defender["defense"])
+            mitigation = armor / (armor + defense_k) if (armor + defense_k) > 0 else 0.0
+            base = attacker["attack"] * (1.0 - mitigation)
             base = max(1, round(base))
             mult = rng.uniform(1 - variance, 1 + variance)
             dmg = max(1, round(base * mult))

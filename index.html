@@ -904,7 +904,7 @@ const CFG = {
   defense: [0, 50],
   rounds: 50,
   v: 0.15,
-  eff: 0.5
+  k: 50
 };
 
 const SEED = [
@@ -1037,7 +1037,9 @@ function fight(a, b, r) {
     for (const s of first) {
       if (hp.a <= 0 || hp.b <= 0) break;
       const d = s === "a" ? "b" : "a", at = F[s], df = F[d];
-      const base = Math.max(1, Math.round(at.attack - df.defense * CFG.eff));
+      const armor = Math.max(0, df.defense);
+      const mit = (armor + CFG.k) > 0 ? armor / (armor + CFG.k) : 0;
+      const base = Math.max(1, Math.round(at.attack * (1 - mit)));
       const dmg = Math.max(1, Math.round(base * (1 - CFG.v + 2 * CFG.v * r())));
       const isCrit = dmg > base * 1.1;
       const move = MOVES[Math.floor(r() * MOVES.length)];
