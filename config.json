@@ -1,0 +1,12 @@
+{
+  "stat_total_cap": 150,
+  "hp":      { "min": 10, "max": 100 },
+  "attack":  { "min": 1,  "max": 50 },
+  "defense": { "min": 0,  "max": 50 },
+  "name_max_length": 24,
+  "catchphrase_max_length": 80,
+  "max_rounds": 50,
+  "damage_variance": 0.15,
+  "defense_effectiveness": 0.5,
+  "organizer_handles": []
+}

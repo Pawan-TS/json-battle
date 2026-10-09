@@ -1,0 +1,9 @@
+{
+  "name": "Your Fighter Name",
+  "hp": 50,
+  "attack": 25,
+  "defense": 25,
+  "catchphrase": "Say something memorable!",
+  "victory_quote": "What do you say when you win?",
+  "archetype": "Balanced Brawler"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Glass Cannon",
+  "hp": 40,
+  "attack": 50,
+  "defense": 5,
+  "catchphrase": "I'll break you before I break!",
+  "victory_quote": "See? Didn't even need defense.",
+  "archetype": "Glass Cannon"
+}

@@ -1,0 +1,9 @@
+{
+  "name": "Balanced Brawler",
+  "hp": 60,
+  "attack": 45,
+  "defense": 45,
+  "catchphrase": "I'm ready for anything.",
+  "victory_quote": "Balance is key to victory.",
+  "archetype": "Balanced Brawler"
+}
