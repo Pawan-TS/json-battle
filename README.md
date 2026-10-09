@@ -116,12 +116,6 @@ python validate.py --pr fighters/<github-handle>.json <github-handle>
 
 ---
 
-## 🛠️ Event Organizers
-
-Running a live workshop or tournament? Check out the [Organizer Runbook (HOST_GUIDE.md)](./HOST_GUIDE.md) for a step-by-step 1-hour event schedule, live bracket projection tips, and PR merge routines.
-
----
-
 ## 📄 License
 
 This project is licensed under the [MIT License](./LICENSE).
